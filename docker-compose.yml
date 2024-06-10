@@ -1,0 +1,24 @@
+version: '3'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+  user-service:
+    build: ./user-service
+    ports:
+      - "3004:3004"
+  email-sync-service:
+    build: ./email-sync-service
+    ports:
+      - "3001:3001"
+  email-data-service:
+    build: ./email-data-service
+    ports:
+      - "3002:3002"
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "3003:3003"
