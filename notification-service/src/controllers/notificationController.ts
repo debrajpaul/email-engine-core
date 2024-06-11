@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { NotificationService } from '../services/emailService';
+import { NotificationService } from '../services/notificationService';
 import { INotification,INotificationService } from '../common/abstractions';
 
 

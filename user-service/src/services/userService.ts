@@ -12,17 +12,17 @@ export class UserService implements IUserService {
     this.httpClient =httpClient;
   }
 
-  async addUser(userId:string,username:string, password:string ):Promise<IUser>{
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser: IUser = { id: userId, username, password: hashedPassword };
-    return newUser;
-  }
-
   static getInstance(httpClient:AxiosInstance):UserService {
     if(!UserService.instance){
       UserService.instance = new UserService(httpClient)
     }
     return UserService.instance
+  }
+      
+  async addUser(userId:string,username:string, password:string ):Promise<IUser>{
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser: IUser = { id: userId, username, password: hashedPassword };
+    return newUser;
   }
 
   getOutlookAuthUrl(): string {
@@ -42,7 +42,7 @@ export class UserService implements IUserService {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
-  });
-    return response.data;
+    });
+    return response?.data;
   }
 }

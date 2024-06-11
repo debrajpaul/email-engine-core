@@ -19,7 +19,6 @@ export class OutlookService implements IOutlookService {
   getAccessToken(token: string): ITokenData {
     // Logic to retrieve the user's access token
   const decoded: any = jwt.verify(token, `${config.jwtSecret}`);
-  console.log("decoded--> ",decoded)
   return {
     userId: decoded.userId,
     accessToken: decoded.accessToken
@@ -31,7 +30,6 @@ export class OutlookService implements IOutlookService {
     const response = await this.httpClient.get('https://outlook.office.com/api/v2.0/me/messages', {
       headers: { Authorization: `Bearer ${tokenData.accessToken}` }
     });
-    // console.log("response--> ",response)
     return {emails: response.data.value, userId:tokenData.userId};
   }
 }

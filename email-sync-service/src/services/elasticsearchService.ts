@@ -22,29 +22,35 @@ export class ElasticSearchService implements IElasticSearchService {
   }
 
   async indexEmails(emails: IEmail[]): Promise<void> {
-    const operations = emails.flatMap(email => [
-      { index: { _index: 'emails', _id: email.id } },
-      email
-    ]);
-  
-    const bulkResponse:any = await this.httpClient.bulk({
-      body: operations
-    });
-  
-    if (bulkResponse.errors) {
-      const erroredDocuments: IErroredDocuments[] = [];
-      bulkResponse.items.forEach((action: any, i: number) => {
-        const operation = Object.keys(action)[0];
-        if (action[operation].error) {
-          erroredDocuments.push({
-            status: action[operation].status,
-            error: action[operation].error,
-            operation: operations[i * 2],
-            document: operations[i * 2 + 1]
-          });
-        }
+    try {
+      const operations = emails.flatMap(email => [
+        { index: { _index: 'emails', _id: email.id } },
+        email
+      ]);
+    
+      const bulkResponse:any = await this.httpClient.bulk({
+        body: operations
       });
-      console.error(erroredDocuments);
+    
+      if (bulkResponse.errors) {
+        const erroredDocuments: IErroredDocuments[] = [];
+        bulkResponse.items.forEach((action: any, i: number) => {
+          const operation = Object.keys(action)[0];
+          if (action[operation].error) {
+            erroredDocuments.push({
+              status: action[operation].status,
+              error: action[operation].error,
+              operation: operations[i * 2],
+              document: operations[i * 2 + 1]
+            });
+          }
+        });
+        console.error('Error indexing some documents:', erroredDocuments);
+      } else {
+        console.log('All emails indexed successfully');
+      }
+    } catch (error) {
+      console.error('Failed to sync emails:', error);
     }
   }
 

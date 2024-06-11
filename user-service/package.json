@@ -19,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "jest-cli": "^29.7.0",
     "jest-mock-extended": "^3.0.7",
     "jsonwebtoken": "^9.0.2",
     "swagger-jsdoc": "^3.2.9",

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles ./src/*.test.ts",
+    "test": "jest",
     "build": "tsc -p .",
     "start": "node ./dist/index"
   },
@@ -15,14 +15,18 @@
     "@elastic/elasticsearch": "^7.14.0",
     "@types/elasticsearch": "^5.0.43",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.14.2",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^3.0.7",
     "jsonwebtoken": "^9.0.2",
     "swagger-jsdoc": "^3.2.9",
     "swagger-ui-express": "^4.0.5",
+    "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
   },
