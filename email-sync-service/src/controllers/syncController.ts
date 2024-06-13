@@ -8,6 +8,8 @@ import { OutlookService } from '../services/outlookService';
 import { ElasticSearchService } from '../services/elasticsearchService';
 import { rateLimiter } from '../utils/rateLimiter';
 import { IEmail,IElasticSearchService,IOutlookService } from '../common/abstractions';
+import { enqueueEmailSyncTask } from '../services/kafkaProducer';
+import { startConsumer } from '../services/kafkaConsumer';
 import axios from 'axios';
 
 const syncRateLimiter = rateLimiter(10, 60000); // 10 requests per minute
@@ -37,18 +39,19 @@ syncRouter.post("/:token",async (req: Request, res: Response) =>  {
 
   try {
     const {emails, userId} = await outlookService.fetchEmails(token);
+    enqueueEmailSyncTask(userId,emails)
     // console.log("emails--> ",JSON.stringify(emails.slice(2)))
-    const formattedEmails: IEmail[] = emails.map((email: any) => ({
-      id: email.Id,
-      userId,
-      subject: email.Subject,
-      body: email.BodyPreview,
-      from: email.From.EmailAddress.Address,
-      to: email.ToRecipients.map((recipient: any) => recipient.EmailAddress.Address),
-      date: email.ReceivedDateTime
-    }));
-    // console.log("formattedEmails--> ",JSON.stringify(formattedEmails.slice(1,2)))
-    await elasticSearchService.indexEmails(formattedEmails);
+    // const formattedEmails: IEmail[] = emails.map((email: any) => ({
+    //   id: email.Id,
+    //   userId,
+    //   subject: email.Subject,
+    //   body: email.BodyPreview,
+    //   from: email.From.EmailAddress.Address,
+    //   to: email.ToRecipients.map((recipient: any) => recipient.EmailAddress.Address),
+    //   date: email.ReceivedDateTime
+    // }));
+    // // console.log("formattedEmails--> ",JSON.stringify(formattedEmails.slice(1,2)))
+    // await elasticSearchService.indexEmails(formattedEmails);
 
     res.status(200).send('Emails synchronized successfully.');
   } catch (error) {
@@ -73,6 +76,7 @@ syncRouter.post("/:token",async (req: Request, res: Response) =>  {
 syncRouter.get("/status/:userId",async (req: Request, res: Response) =>  {
   // Logic to check sync status
   const { userId } = req.params;
+  startConsumer().catch(e=> console.error(e));
   res.json({ status: 'In Progress', user:userId });
 })
 

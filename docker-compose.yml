@@ -6,19 +6,37 @@ services:
       - discovery.type=single-node
     ports:
       - "9200:9200"
-  user-service:
-    build: ./user-service
+  zookeeper:
+    image: bitnami/zookeeper:latest
     ports:
-      - "3004:3004"
-  email-sync-service:
-    build: ./email-sync-service
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: bitnami/kafka:latest
     ports:
-      - "3001:3001"
-  email-data-service:
-    build: ./email-data-service
-    ports:
-      - "3002:3002"
-  notification-service:
-    build: ./notification-service
-    ports:
-      - "3003:3003"
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+  # user-service:
+  #   build: ./user-service
+  #   ports:
+  #     - "3004:3004"
+  # email-sync-service:
+  #   build: ./email-sync-service
+  #   ports:
+  #     - "3001:3001"
+  # email-data-service:
+  #   build: ./email-data-service
+  #   ports:
+  #     - "3002:3002"
+  # notification-service:
+  #   build: ./notification-service
+  #   ports:
+  #     - "3003:3003"
