@@ -10,6 +10,7 @@ import { rateLimiter } from '../utils/rateLimiter';
 import { IEmail,IElasticSearchService,IOutlookService } from '../common/abstractions';
 import { enqueueEmailSyncTask } from '../services/kafkaProducer';
 import { startConsumer } from '../services/kafkaConsumer';
+import { handleWebhook } from '../services/webhookService';
 import axios from 'axios';
 
 const syncRateLimiter = rateLimiter(10, 60000); // 10 requests per minute
@@ -79,5 +80,27 @@ syncRouter.get("/status/:userId",async (req: Request, res: Response) =>  {
   startConsumer().catch(e=> console.error(e));
   res.json({ status: 'In Progress', user:userId });
 })
+
+/**
+ * @swagger
+ *
+ * /outlook-webhook:
+ *   post:
+ *     description: For immediate notification of changes in the mailbox.
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: I working a_ok.
+ */
+
+syncRouter.post('/outlook-webhook', async (req, res) => {
+  try {
+    await handleWebhook(req.body);
+    res.status(200).send('Event received');
+  } catch (error) {
+    res.status(500).send('Error processing event');
+  }
+});
 
 export default syncRouter;
