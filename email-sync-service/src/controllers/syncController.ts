@@ -7,7 +7,7 @@ import { Router , Request, Response } from 'express';
 import { OutlookService } from '../services/outlookService';
 import { ElasticSearchService } from '../services/elasticsearchService';
 import { rateLimiter } from '../utils/rateLimiter';
-import { IEmail,IElasticSearchService,IOutlookService } from '../common/abstractions';
+import { IEmail,IElasticSearchService,IOutlookService,ITokenData } from '../common/abstractions';
 import { enqueueEmailSyncTask } from '../services/kafkaProducer';
 import { startConsumer } from '../services/kafkaConsumer';
 import { handleWebhook } from '../services/webhookService';
@@ -32,28 +32,14 @@ const elasticSearchService:IElasticSearchService = ElasticSearchService.getInsta
  */
 
 syncRouter.post("/:token",async (req: Request, res: Response) =>  {
-  const { token } = req.params;
-
-  if (!syncRateLimiter()) {
-    return res.status(429).send('Rate limit exceeded. Try again later.');
-  }
-
   try {
-    const {emails, userId} = await outlookService.fetchEmails(token);
+    const { token } = req.params;
+    if (!syncRateLimiter()) {
+      return res.status(429).send('Rate limit exceeded. Try again later.');
+    }
+    const {userId,accessToken}:ITokenData = outlookService.getAccessToken(token)
+    const emails = await outlookService.fetchEmails(accessToken);
     enqueueEmailSyncTask(userId,emails)
-    // console.log("emails--> ",JSON.stringify(emails.slice(2)))
-    // const formattedEmails: IEmail[] = emails.map((email: any) => ({
-    //   id: email.Id,
-    //   userId,
-    //   subject: email.Subject,
-    //   body: email.BodyPreview,
-    //   from: email.From.EmailAddress.Address,
-    //   to: email.ToRecipients.map((recipient: any) => recipient.EmailAddress.Address),
-    //   date: email.ReceivedDateTime
-    // }));
-    // // console.log("formattedEmails--> ",JSON.stringify(formattedEmails.slice(1,2)))
-    // await elasticSearchService.indexEmails(formattedEmails);
-
     res.status(200).send('Emails synchronized successfully.');
   } catch (error) {
     console.error(error)

@@ -1,7 +1,7 @@
 import {AxiosInstance} from 'axios';
 import jwt from 'jsonwebtoken';
 import { config } from '../config';
-import {IFetchData, IOutlookService, ITokenData } from '../common/abstractions';
+import { IEmail, IOutlookService, ITokenData } from '../common/abstractions';
 
 export class OutlookService implements IOutlookService {
   private static instance:OutlookService;
@@ -17,7 +17,6 @@ export class OutlookService implements IOutlookService {
   }
 
   getAccessToken(token: string): ITokenData {
-    // Logic to retrieve the user's access token
   const decoded: any = jwt.verify(token, `${config.jwtSecret}`);
   return {
     userId: decoded.userId,
@@ -25,11 +24,10 @@ export class OutlookService implements IOutlookService {
   };
   }
 
-  async fetchEmails(token: string): Promise<IFetchData> {
-    const tokenData = this.getAccessToken(token);
+  async fetchEmails(accessToken: string): Promise<IEmail[]> {
     const response = await this.httpClient.get('https://outlook.office.com/api/v2.0/me/messages', {
-      headers: { Authorization: `Bearer ${tokenData.accessToken}` }
+      headers: { Authorization: `Bearer ${accessToken}` }
     });
-    return {emails: response.data.value, userId:tokenData.userId};
+    return response.data.value
   }
 }

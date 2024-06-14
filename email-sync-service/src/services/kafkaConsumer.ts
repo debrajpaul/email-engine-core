@@ -38,7 +38,6 @@ export const startConsumer = async () => {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-        console.log("i am in")
       await processMessage(message);
     },
   });

@@ -3,7 +3,7 @@ import axios, { AxiosInstance } from 'axios';
 import jwt from 'jsonwebtoken';
 import { OutlookService } from './outlookService';
 import { config } from '../config';
-import { ITokenData, IFetchData, IEmail, IOutlookService } from '../common/abstractions';
+import { IOutlookService } from '../common/abstractions';
 
 jest.mock('axios');
 jest.mock('jsonwebtoken');
