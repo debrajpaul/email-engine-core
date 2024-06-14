@@ -7,7 +7,7 @@ export const handleWebhook = async (body: any) => {
     case 'created':
     case 'updated':
     case 'deleted':
-      await enqueueEmailSyncTask(userId, resourceData.id);
+      await enqueueEmailSyncTask(userId, resourceData);
       break;
     default:
       console.log('Unknown change type');
