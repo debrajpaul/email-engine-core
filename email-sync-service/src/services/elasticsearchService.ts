@@ -70,4 +70,26 @@ export class ElasticSearchService implements IElasticSearchService {
     });
     return body.hits.hits;
   }
+
+  async getUserIds():Promise<string[]> {
+    // Implement this function to get all user IDs
+    return [""]
+  }
+
+  async getEmailIdsForUser (userId: string): Promise<string[]> {
+    const result = await this.httpClient.search({
+      index: 'emails', // Ensure this matches the index name used in your Elasticsearch setup
+      body: {
+        query: {
+          match: {
+            userId: userId
+          }
+        },
+        _source: false, // We don't need the actual documents, just the IDs
+        fields: [], // This helps to reduce the payload size
+      }
+    });
+    return result.body.hits.hits.map((hit: any) => hit._id);
+  };
+  
 }

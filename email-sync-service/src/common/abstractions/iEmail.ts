@@ -18,4 +18,6 @@ export interface IErroredDocuments {
 export interface IElasticSearchService {
   indexEmails(emails: IEmail[] ):Promise<void>;
   searchEmails(userId: string, query: string):Promise<Record<string, any>>;
+  getUserIds():Promise<string[]>
+  getEmailIdsForUser(userId: string):Promise<string[]> 
 }

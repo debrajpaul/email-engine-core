@@ -30,4 +30,10 @@ export class OutlookService implements IOutlookService {
     });
     return response.data.value
   }
+
+  async fetchEmailsByEmailId(userId:string, emailId: string): Promise<IEmail[]>{
+     // Implement this function to get all emails for an user
+    const accessToken = "";
+    return this.fetchEmails(accessToken)
+  }
 }

@@ -8,4 +8,5 @@ export interface ITokenData{
   export interface IOutlookService {
     getAccessToken(token: string): ITokenData;
     fetchEmails(accessToken: string): Promise<IEmail[]>;
+    fetchEmailsByEmailId(userId:string, emailId: string): Promise<IEmail[]>;
   }
